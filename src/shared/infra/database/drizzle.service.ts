@@ -1,6 +1,3 @@
-import { studentsSchema } from "@academic/students/infra/database/schemas/student.schema";
-import { subjectsSchema } from "@academic/subjects/infra/database/schemas/subject.schema";
-import { teachersSchema } from "@academic/teachers/infra/database/schemas/teacher.schema";
 import {
   attendanceStatusEnum,
   attendancesSchema,
@@ -8,27 +5,26 @@ import {
 import {
   classOfferingStatusEnum,
   classOfferingsSchema,
-} from "@class-offering/infra/database/schemas/class-offering.schema";
+} from "@attendance/infra/database/schemas/class-offering-ref.schema";
 import {
   enrollmentStatusEnum,
   enrollmentsSchema,
-} from "@enrollment/infra/database/schemas/enrollment.schema";
+} from "@attendance/infra/database/schemas/enrollment-ref.schema";
+import { lessonsSchema } from "@attendance/infra/database/schemas/lesson-ref.schema";
+import { studentsSchema } from "@attendance/infra/database/schemas/student-ref.schema";
 import { Injectable, type OnModuleDestroy } from "@nestjs/common";
-import { usersSchema } from "@users/infra/database/schemas/user.schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
 const schema = {
-  subjectsSchema,
-  studentsSchema,
-  teachersSchema,
   attendancesSchema,
   attendanceStatusEnum,
+  studentsSchema,
+  lessonsSchema,
   classOfferingsSchema,
   classOfferingStatusEnum,
   enrollmentsSchema,
   enrollmentStatusEnum,
-  usersSchema,
 };
 
 @Injectable()
