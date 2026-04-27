@@ -3,7 +3,7 @@ import type { Attendance } from "@attendance/domain/models/attendance.entity";
 export const ATTENDANCE_REPOSITORY = Symbol("ATTENDANCE_REPOSITORY");
 
 export interface AttendanceRepository {
-  create(attendance: Attendance): Promise<void>;
+  create(attendance: Attendance): Promise<Attendance>;
   findByStudentAndClassOffering(
     studentId: string,
     classOfferingId: string,
