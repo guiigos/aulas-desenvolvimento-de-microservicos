@@ -12,15 +12,23 @@ import { and, eq } from "drizzle-orm";
 export class DrizzleAttendanceRepository implements AttendanceRepository {
   constructor(private readonly drizzleService: DrizzleService) {}
 
-  async create(attendance: Attendance): Promise<void> {
-    await this.drizzleService.db.insert(attendancesSchema).values({
-      studentId: attendance.studentId,
-      lessonId: attendance.lessonId,
-      classOfferingId: attendance.classOfferingId,
-      status: attendance.status,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+  async create(attendance: Attendance): Promise<Attendance> {
+    const [row] = await this.drizzleService.db
+      .insert(attendancesSchema)
+      .values({
+        studentId: attendance.studentId,
+        lessonId: attendance.lessonId,
+        classOfferingId: attendance.classOfferingId,
+        status: attendance.status,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    return Attendance.restore({
+      ...row,
+      status: row.status as AttendanceStatus,
+    })!;
   }
 
   async findByStudentAndClassOffering(

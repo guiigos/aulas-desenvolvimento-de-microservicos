@@ -1,12 +1,13 @@
 import { AttendanceDto } from "@attendance/application/dto/attendance.dto";
 import {
   Attendance,
-  AttendanceStatus,
+  type AttendanceStatus,
 } from "@attendance/domain/models/attendance.entity";
 import {
   ATTENDANCE_REPOSITORY,
   type AttendanceRepository,
 } from "@attendance/domain/repositories/attendance-repository.interface";
+import { MessagingPublisherService } from "@attendance/messaging/application/services/messaging-publisher.service";
 import { Inject, Injectable } from "@nestjs/common";
 import type { PaginatedResult } from "@shared/infra/hateoas";
 
@@ -15,6 +16,7 @@ export class AttendanceService {
   constructor(
     @Inject(ATTENDANCE_REPOSITORY)
     private readonly attendanceRepository: AttendanceRepository,
+    private readonly messagingPublisher: MessagingPublisherService,
   ) {}
 
   async register(dto: {
@@ -24,7 +26,16 @@ export class AttendanceService {
     status: AttendanceStatus;
   }): Promise<void> {
     const attendance = Attendance.restore(dto);
-    await this.attendanceRepository.create(attendance!);
+    const saved = await this.attendanceRepository.create(attendance!);
+
+    await this.messagingPublisher.publishAttendanceRegistered({
+      id: saved.id!,
+      studentId: saved.studentId,
+      lessonId: saved.lessonId,
+      classOfferingId: saved.classOfferingId,
+      status: saved.status,
+      registeredAt: (saved.createdAt ?? new Date()).toISOString(),
+    });
   }
 
   async findByStudentAndClassOffering(
